@@ -1,0 +1,124 @@
+require("dotenv").config();
+
+const express = require('express');
+const eventHandlers = require('./src/handlers');
+const logger = require('./src/utils/logger');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// 中间件
+app.use(express.json({ limit: '10mb' }));
+
+// 健康检查端点
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    service: 'emby-dingtalk-notifier',
+    version: '1.0.0'
+  });
+});
+
+// 钉钉连接测试端点
+app.get('/test/dingtalk', async (req, res) => {
+  try {
+    const dingtalk = require('./src/adapters/dingtalk');
+    const result = await dingtalk.testConnection();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Emby Webhook 接收端点
+app.post('/webhook', async (req, res) => {
+  try {
+    const data = req.body;
+    const event = data.Event;
+    
+    logger.info(`收到 Emby Webhook 事件: ${event}`, {
+      user: data.UserName,
+      item: data.ItemName,
+      device: data.DeviceName
+    });
+    
+    const handler = eventHandlers[event];
+    
+    if (handler) {
+      await handler(data);
+      res.json({ 
+        status: 'success', 
+        message: '事件处理成功',
+        event: event
+      });
+    } else {
+      logger.warn(`未处理的事件类型: ${event}`);
+      res.json({ 
+        status: 'ignored', 
+        message: '事件类型被忽略',
+        event: event
+      });
+    }
+  } catch (error) {
+    logger.error('Webhook 处理失败:', error);
+    res.status(500).json({ 
+      status: 'error', 
+      message: '事件处理失败',
+      error: error.message 
+    });
+  }
+});
+
+// 测试特定事件端点
+app.post('/test/:eventType', async (req, res) => {
+  const eventType = req.params.eventType;
+  const testData = {
+    Event: eventType,
+    UserName: '测试用户',
+    ItemName: '测试影片',
+    DeviceName: 'Chrome浏览器',
+    Client: 'Emby Web',
+    RemoteEndPoint: '192.168.1.100',
+    Timestamp: new Date().toISOString(),
+    ...req.body
+  };
+  
+  try {
+    const handler = eventHandlers[eventType];
+    if (handler) {
+      await handler(testData);
+      res.json({ 
+        status: 'success', 
+        message: '测试消息发送成功',
+        event: eventType 
+      });
+    } else {
+      res.status(404).json({ error: '未找到对应的事件处理器' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 404 处理
+app.use('*', (req, res) => {
+  res.status(404).json({ error: '接口不存在' });
+});
+
+// 全局错误处理
+app.use((error, req, res, next) => {
+  logger.error('服务器错误:', error);
+  res.status(500).json({ error: '内部服务器错误' });
+});
+
+// 启动服务器
+app.listen(PORT, () => {
+  console.log(`🚀 Emby Dingtalk Notifier 服务已启动`);
+  console.log(`📍 服务地址: http://localhost:${PORT}`);
+  console.log(`📝 Webhook 端点: http://localhost:${PORT}/webhook`);
+  console.log(`🔧 健康检查: http://localhost:${PORT}/health`);
+  console.log(`🧪 钉钉测试: http://localhost:${PORT}/test/dingtalk`);
+});
+
+module.exports = app;

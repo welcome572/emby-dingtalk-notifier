@@ -1,0 +1,62 @@
+const dingtalk = require('../adapters/dingtalk'); const { getMediaTypeIcon } = require('../utils/helpers'); 
+const logger = require('../utils/logger'); class MediaHandlers {
+  /** * 新内容添加 */ static async itemAdded(data) { const icon = getMediaTypeIcon(data.ItemType);
+    
+    const message = { title: `${icon} 新内容添加`, content: `**内容名称**: ${data.ItemName || '未知内容'} 
+**内容类型**: ${data.ItemType || '未知类型'} **年份**: ${data.ProductionYear || '未知'} **评分**: 
+${data.CommunityRating ? `${data.CommunityRating}/10` : '暂无评分'} **添加时间**: ${new 
+Date(data.Timestamp).toLocaleString()} ${data.Overview ? `**简介**: ${data.Overview.substring(0, 100)}...` : 
+''}`,
+      atAll: false
+    };
+    await dingtalk.sendMarkdown(message);
+  }
+  /** * 内容更新 */ static async itemUpdated(data) { const icon = getMediaTypeIcon(data.ItemType);
+    
+    const message = { title: `${icon} 内容更新`, content: `**内容名称**: ${data.ItemName || '未知内容'} 
+**内容类型**: ${data.ItemType || '未知类型'} **更新类型**: ${data.UpdateReason || '元数据更新'} **更新时间**: 
+${new Date(data.Timestamp).toLocaleString()}`,
+      atAll: false
+    };
+    await dingtalk.sendMarkdown(message);
+  }
+  /** * 内容删除 */ static async itemDeleted(data) { const icon = getMediaTypeIcon(data.ItemType);
+    
+    const message = { title: `${icon} 内容删除`, content: `**内容名称**: ${data.ItemName || '未知内容'} 
+**内容类型**: ${data.ItemType || '未知类型'} **删除路径**: ${data.ItemPath || '未知路径'} **删除时间**: ${new 
+Date(data.Timestamp).toLocaleString()}
+> ⚠️ 内容已从媒体库中删除`,
+      atAll: false
+    };
+    await dingtalk.sendMarkdown(message);
+  }
+  /** * 内容评分 */ static async itemRated(data) { const icon = getMediaTypeIcon(data.ItemType);
+    
+    const message = { title: `${icon} 内容评分`, content: `**用户**: ${data.UserName || '未知用户'} **内容**: 
+${data.ItemName || '未知内容'} **评分**: ${data.Rating || '未知'}/10 **评分时间**: ${new 
+Date(data.Timestamp).toLocaleString()}`,
+      atAll: false
+    };
+    await dingtalk.sendMarkdown(message);
+  }
+  /** * 内容标记为已播放 */ static async itemMarkedPlayed(data) { const icon = getMediaTypeIcon(data.ItemType);
+    
+    const message = { title: `${icon} 标记为已观看`, content: `**用户**: ${data.UserName || '未知用户'} 
+**内容**: ${data.ItemName || '未知内容'} **播放进度**: 100% **标记时间**: ${new 
+Date(data.Timestamp).toLocaleString()}`,
+      atAll: false
+    };
+    await dingtalk.sendMarkdown(message);
+  }
+  /** * 内容标记为未播放 */ static async itemMarkedUnplayed(data) { const icon = 
+    getMediaTypeIcon(data.ItemType);
+    
+    const message = { title: `${icon} 标记为未观看`, content: `**用户**: ${data.UserName || '未知用户'} 
+**内容**: ${data.ItemName || '未知内容'} **播放进度**: 重置为 0% **标记时间**: ${new 
+Date(data.Timestamp).toLocaleString()}`,
+      atAll: false
+    };
+    await dingtalk.sendMarkdown(message);
+  }
+}
+module.exports = MediaHandlers;
