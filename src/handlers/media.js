@@ -144,6 +144,45 @@ class MediaHandlers {
 
     await dingtalk.sendMarkdown(message);
   }
+
+  /**
+   * 新库内容事件
+   */
+  static async libraryNew(data) {
+    const { 
+      UserName = '未知用户',
+      ItemName = '未知项目',
+      ItemType = '未知类型',
+      ServerName = '未知服务器',
+      LibraryName = '未知媒体库'
+    } = data;
+
+    const icon = getMediaTypeIcon(ItemType);
+    
+    let timestampStr = '未知时间';
+    try {
+      if (data.Timestamp || data.Date) {
+        timestampStr = new Date(data.Timestamp || data.Date).toLocaleString('zh-CN');
+      }
+    } catch (e) {
+      timestampStr = new Date().toLocaleString('zh-CN');
+    }
+
+    const message = {
+      title: `${icon} 新内容添加到媒体库`,
+      content: `**服务器**: ${ServerName}\n` +
+              `**媒体库**: ${LibraryName}\n` +
+              `**内容名称**: ${ItemName}\n` +
+              `**内容类型**: ${ItemType}\n` +
+              `**添加用户**: ${UserName}\n` +
+              `**添加时间**: ${timestampStr}\n\n` +
+              `---\n` +
+              `🎉 新的媒体内容已成功添加到库中！`,
+      atAll: false
+    };
+
+    await dingtalk.sendMarkdown(message);
+  }
 }
 
 module.exports = MediaHandlers;

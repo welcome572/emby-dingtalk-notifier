@@ -18,6 +18,7 @@ const eventHandlers = {
   'item.added': mediaHandlers.itemAdded, 'item.updated': mediaHandlers.itemUpdated, 'item.deleted': 
   mediaHandlers.itemDeleted, 'item.rated': mediaHandlers.itemRated, 'item.markedplayed': 
   mediaHandlers.itemMarkedPlayed, 'item.markedunplayed': mediaHandlers.itemMarkedUnplayed,
+  'library.new': mediaHandlers.libraryNew,
   
   // === 系统事件 ===
   'server.started': systemHandlers.serverStarted, 'server.shutdown': systemHandlers.serverShutdown, 
