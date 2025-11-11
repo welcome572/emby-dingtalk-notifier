@@ -7,10 +7,10 @@ class UserHandlers {
    */
   static async userAuthenticated(data) {
     // 处理真实 Emby 数据结构
-    const userName = data.User?.Name || data.UserName || '未知用户';
-    const deviceName = data.Session?.DeviceName || data.DeviceName || '未知设备';
-    const client = data.Session?.Client || data.Client || '未知客户端';
-    const ip = data.Session?.RemoteEndPoint || data.RemoteEndPoint || '未知';
+    const userName = (data.User && data.User.Name) || data.UserName || '未知用户';
+    const deviceName = (data.Session && data.Session.DeviceName) || data.DeviceName || '未知设备';
+    const client = (data.Session && data.Session.Client) || data.Client || '未知客户端';
+    const ip = (data.Session && data.Session.RemoteEndPoint) || data.RemoteEndPoint || '未知';
     
     let timestampStr = '未知时间';
     try {
@@ -39,10 +39,10 @@ class UserHandlers {
    */
   static async userLoggedOut(data) {
     // 处理真实 Emby 数据结构
-    const userName = data.User?.Name || data.UserName || '未知用户';
-    const deviceName = data.Session?.DeviceName || data.DeviceName || '未知设备';
-    const client = data.Session?.Client || data.Client || '未知客户端';
-    const ip = data.Session?.RemoteEndPoint || data.RemoteEndPoint || '未知';
+    const userName = (data.User && data.User.Name) || data.UserName || '未知用户';
+    const deviceName = (data.Session && data.Session.DeviceName) || data.DeviceName || '未知设备';
+    const client = (data.Session && data.Session.Client) || data.Client || '未知客户端';
+    const ip = (data.Session && data.Session.RemoteEndPoint) || data.RemoteEndPoint || '未知';
     
     let timestampStr = '未知时间';
     try {

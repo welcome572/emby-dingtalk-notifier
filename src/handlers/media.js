@@ -8,13 +8,13 @@ class MediaHandlers {
    */
   static async itemAdded(data) {
     // 处理真实 Emby 数据结构
-    const itemName = data.Item?.Name || data.ItemName || '未知内容';
-    const itemType = data.Item?.Type || data.ItemType || '未知类型';
-    const seriesName = data.Item?.SeriesName || '未知系列';
-    const seasonNumber = data.Item?.ParentIndexNumber || '未知季';
-    const episodeNumber = data.Item?.IndexNumber || '未知集';
-    const productionYear = data.Item?.ProductionYear || data.ProductionYear || '未知';
-    const overview = data.Item?.Overview || data.Overview || '';
+    const itemName = (data.Item && data.Item.Name) || data.ItemName || '未知内容';
+    const itemType = (data.Item && data.Item.Type) || data.ItemType || '未知类型';
+    const seriesName = (data.Item && data.Item.SeriesName) || '未知系列';
+    const seasonNumber = (data.Item && data.Item.ParentIndexNumber) || '未知季';
+    const episodeNumber = (data.Item && data.Item.IndexNumber) || '未知集';
+    const productionYear = (data.Item && data.Item.ProductionYear) || data.ProductionYear || '未知';
+    const overview = (data.Item && data.Item.Overview) || data.Overview || '';
     
     let timestampStr = '未知时间';
     try {

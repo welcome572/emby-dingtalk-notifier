@@ -12,7 +12,7 @@ class PlaybackHandlers {
     console.log('=== 数据结束 ===');
     
     // 处理真实 Emby 数据结构
-    const userName = data.User?.Name || data.UserName || '未知用户';
+   const userName = (data.User && (data.User && data.User.Name)) || data.UserName || '未知用户';
     const itemName = data.Item?.Name || data.ItemName || '未知内容';
     const itemType = data.Item?.Type || data.ItemType || '未知类型';
     const seriesName = data.Item?.SeriesName || '未知系列';
@@ -23,7 +23,7 @@ class PlaybackHandlers {
     const client = data.Session?.Client || data.Client || '未知客户端';
     const ip = data.Session?.RemoteEndPoint || data.RemoteEndPoint || '未知';
     
-    const duration = data.Item?.RunTimeTicks ? formatDuration(data.Item.RunTimeTicks) : '未知';
+    const duration = data.Item?.RunTimeTicks ? formatDuration((data.Item && data.Item.RunTimeTicks)) : '未知';
     
     // 处理时间戳
     let timestampStr = '未知时间';
@@ -78,13 +78,13 @@ class PlaybackHandlers {
     const deviceName = data.Session?.DeviceName || data.DeviceName || '未知设备';
     
     const playDuration = data.PlaybackInfo?.PositionTicks ? formatDuration(data.PlaybackInfo.PositionTicks) : '未知';
-    const totalDuration = data.Item?.RunTimeTicks ? formatDuration(data.Item.RunTimeTicks) : '未知';
+    const totalDuration = data.Item?.RunTimeTicks ? formatDuration((data.Item && data.Item.RunTimeTicks)) : '未知';
     const icon = getMediaTypeIcon(itemType);
     
     // 计算播放进度
     let progress = 0;
     if (data.Item?.RunTimeTicks && data.PlaybackInfo?.PositionTicks) {
-      progress = Math.round((data.PlaybackInfo.PositionTicks / data.Item.RunTimeTicks) * 100);
+      progress = Math.round((data.PlaybackInfo.PositionTicks / (data.Item && data.Item.RunTimeTicks)) * 100);
     }
 
     // 构建详细消息内容
